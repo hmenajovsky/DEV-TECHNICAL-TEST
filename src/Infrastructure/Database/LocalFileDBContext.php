@@ -81,7 +81,7 @@ class LocalFileDBContext implements DBContext
         $idProperty->setAccessible(true);
 
         if (!$idProperty->getValue($entity)) {
-            $idProperty->setValue($entity, uniqid());
+            $idProperty->setValue($entity, $this->generateUniqueISBN());
         }
 
         $this->data[$fullClassName][$idProperty->getValue($entity)] = $entity;
@@ -100,5 +100,52 @@ class LocalFileDBContext implements DBContext
     public function findByID(string $entityName, string $id): ?BaseEntity
     {
         return $this->data[$entityName][$id] ?? null;
+    }
+
+    private function generateUniqueISBN(): string
+    {
+        static $generatedISBNs = [];
+        do {
+            $isbn = $this->generateRandomISBN();
+        } while (in_array($isbn, $generatedISBNs));
+
+        $generatedISBNs[] = $isbn;
+
+        return $isbn;
+    }
+
+
+    private function generateRandomISBN(): string
+    {
+        $isbn = '978';
+
+        for ($i = 0; $i < 9; $i++) {
+            if ($i == 0 || $i == 4 || $i == 8) {
+                $isbn .= '-';
+            }
+            $isbn .= mt_rand(0, 9);
+        }
+
+        $isbn .= $this->calculateISBNCheckDigit($isbn);
+        $isbn = substr_replace($isbn, '-', 12, 0);
+
+        return $isbn;
+    }
+
+    private function calculateISBNCheckDigit($isbn): string
+    {
+        $sum = 0;
+        $multiplier = 1;
+        for ($i = 0; $i < strlen($isbn); $i++) {
+            if ($isbn[$i] == '-')
+                continue;
+            $sum += $multiplier * (int) $isbn[$i];
+            $multiplier = $multiplier == 1 ? 3 : 1;
+        }
+        $checkDigit = 10 - ($sum % 10);
+        if ($checkDigit == 10) {
+            $checkDigit = 0;
+        }
+        return $checkDigit;
     }
 }
