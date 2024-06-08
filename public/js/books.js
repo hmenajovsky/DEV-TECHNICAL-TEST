@@ -1,8 +1,9 @@
 (function () {
   "use strict";
   document.addEventListener("DOMContentLoaded", () => { 
-      
+
     const baseUrl = window.location.href;   
+    
 
     function displayBooks() {
       const bookList = document.getElementById("book-list");
@@ -58,6 +59,7 @@
           editItem.appendChild(deleteButton);
           bookList.appendChild(editItem);
 
+          getBookFromButtons();         
         });
       });
     }
@@ -73,7 +75,7 @@
         .catch((error) => {
           console.error("Erreur :", error);
         });
-    }
+    }     
 
     function addBook() {
       const form = document.getElementById("add-form");
@@ -110,6 +112,120 @@
             console.error("Erreur:", error);
           });
       });
+    }
+
+      function getBookFromButtons() {
+      const editButtons = document.querySelectorAll(".update");
+
+      const buttonsNodeList = [];
+      for (let i = 1; i < editButtons.length + 1; i++) {
+        buttonsNodeList.push(document.getElementById(i));
+      }
+
+      buttonsNodeList.forEach((button) => {
+        button.addEventListener("click", function () {
+          const isbn = this.getAttribute("data-id");
+          const bookItem = document.getElementById("book-item");          
+          if (bookItem.innerHTML == "") {           
+            displayOneBook(isbn);
+            updateBook(isbn);
+          } else {
+            bookItem.innerHTML = "";
+            displayOneBook(isbn);
+            updateBook(isbn);
+          }
+        });
+      });
+    }
+
+    function updateBook(id) {
+        const form = document.querySelector("#update-form");
+  
+        form.addEventListener("submit", (event) => {
+          event.preventDefault();
+          const url = `${baseUrl}api/books/${id}`;
+  
+          const bookData = {
+            title: document.querySelector("#updated-title").value,
+            releaseDate: form.querySelector("#updated-date").value,
+          };
+  
+          fetch(url, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ book: bookData }),
+          })
+            .then((booksData) => {
+              if (!booksData.ok) {
+                throw new Error("Problème avec la requête Fetch");
+              }
+            })
+            .then(() => {
+              window.location.reload();
+            })
+            .catch((error) => {
+              console.error("Erreur:", error);
+            });
+        });  
+    } 
+
+    function getOneBook(id) {
+      return fetch(baseUrl + "api/books/" + id)
+        .then((bookData) => {
+          if (!bookData.ok) {
+            throw new Error("Erreur lors de la récupération des données");
+          }
+          return bookData.json();
+        })
+        .catch((error) => {
+          console.error("Erreur :", error);
+        });
+    }
+
+    function displayOneBook(id) {
+      getOneBook(id)
+        .then((bookData) => {
+          const bookItem = document.getElementById("book-item");
+
+          const isbnItem = document.createElement("li");
+          isbnItem.classList.add("grid-item");
+          isbnItem.textContent = bookData.book.id;
+          bookItem.appendChild(isbnItem);
+
+          const titleItem = document.createElement("li");
+          titleItem.classList.add("grid-item");
+          const titleInput = document.createElement("input");
+          titleInput.setAttribute("type", "text");
+          titleInput.setAttribute("id", "updated-title");
+          titleInput.setAttribute("name", "title");
+          titleInput.setAttribute("placeholder", "saisir un titre");
+          titleInput.setAttribute("placeholder", bookData.book.title);
+          titleItem.appendChild(titleInput);
+          bookItem.appendChild(titleItem);
+
+          const dateItem = document.createElement("li");
+          dateItem.classList.add("grid-item");
+          const dateInput = document.createElement("input");
+          dateInput.setAttribute("type", "date");
+          dateInput.setAttribute("id", "updated-date");
+          dateInput.setAttribute("name", "date");
+          dateItem.appendChild(dateInput);
+          bookItem.appendChild(dateItem);
+
+          const submitItem = document.createElement("li");
+          submitItem.classList.add("grid-item");
+          const submitButton = document.createElement("button");
+          submitButton.innerHTML = "Confirmer";
+          submitButton.classList.add("edit-button");
+          submitButton.setAttribute("id", "update-button");
+          submitItem.appendChild(submitButton);
+          bookItem.appendChild(submitItem);
+        })
+        .catch((error) => {
+          console.error("Erreur :", error);
+        });
     }
 
     displayBooks();
