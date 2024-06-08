@@ -4,6 +4,7 @@ namespace EneraTechTest\Infrastructure\Slim;
 
 use EneraTechTest\Adapters\API\GetBooks\Controller as APIGetBooksController;
 use EneraTechTest\Adapters\API\PatchBook\Controller as APIPatchController;
+use EneraTechTest\Adapters\API\DeleteBook\Controller as APIDeleteController;
 use EneraTechTest\Adapters\API\PostBook\Controller as Controller;
 
 class Routes
@@ -53,5 +54,6 @@ class Routes
                 return $response->withStatus(400)->withJson(['error' => 'Champ "book.title" ou "book.releaseDate" manquant dans la requête']);
             }
         });
+        $app->delete('/books/{id}', APIDeleteController::class);
     }
 }

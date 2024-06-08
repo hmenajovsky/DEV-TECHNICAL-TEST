@@ -59,7 +59,8 @@
           editItem.appendChild(deleteButton);
           bookList.appendChild(editItem);
 
-          getBookFromButtons();         
+          getBookFromButtons();  
+          deleteBookFromButtons();       
         });
       });
     }
@@ -227,6 +228,46 @@
           console.error("Erreur :", error);
         });
     }
+
+    function deleteBookFromButtons() {
+        const deleteButtons = document.querySelectorAll(".delete");
+  
+        deleteButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const isbn = this.getAttribute("data-id");
+            deleteOneBook(isbn);
+          });
+        });
+      }
+  
+      function deleteOneBook(id) {
+        const deletedItems = document.getElementsByClassName(id);
+  
+        const bookData = {
+          title: deletedItems[0].textContent,
+          releaseDate: deletedItems[1].textContent,
+        };
+  
+        fetch(baseUrl + "api/books/" + id, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ book: bookData }),
+        })
+          .then((booksData) => {
+            if (!booksData.ok) {
+              throw new Error("Problème avec la requête Fetch");
+            }
+            console.log(bookData);
+          })
+          .then(() => {
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Erreur:", error);
+          });
+      }
 
     displayBooks();
     addBook();
