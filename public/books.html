@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ma bibbliothèqueC</title>
+    <title>Ma bibliothèque</title>
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
@@ -18,6 +18,27 @@
       <li class="grid-header">Actions</li>
     </ul>
     <ul id="book-list" class="grid-container"></ul>
+    <form id="add-form">
+      <ul class="grid-container">
+        <li class="grid-footer"></li>
+        <li class="grid-footer">
+          <input
+            type="text"
+            id="added-title"
+            name="titre"
+            placeholder="saisir un titre"
+          />
+        </li>
+        <li class="grid-footer">
+          <input type="date" id="added-date" name="date" />
+        </li>
+
+        <li class="grid-footer">
+          <button type="submit" class="add-button">Ajouter</button>
+        </li>
+      </ul>
+    </form>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="js/books.js"></script>
   </body>
 </html>
