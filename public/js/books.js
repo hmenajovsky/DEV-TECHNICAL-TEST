@@ -1,16 +1,13 @@
 (function () {
   "use strict";
-  document.addEventListener("DOMContentLoaded", () => { 
-
-    const baseUrl = window.location.href;   
-    
+  document.addEventListener("DOMContentLoaded", () => {
+    const baseUrl = window.location.href;
 
     function displayBooks() {
       const bookList = document.getElementById("book-list");
-
       getBooks().then((booksData) => {
-        const items = [];
         const buttons = [];
+        const items = [];
 
         booksData.forEach((book, index) => {
           const isbnItem = document.createElement("li");
@@ -37,7 +34,6 @@
           dateItem.textContent = displayedDate;
           bookList.appendChild(dateItem);
 
-          
           const editItem = document.createElement("li");
           editItem.setAttribute("data-id", book.id);
           items.push(editItem);
@@ -58,10 +54,9 @@
           deleteButton.classList.add("delete");
           editItem.appendChild(deleteButton);
           bookList.appendChild(editItem);
-
-          getBookFromButtons();  
-          deleteBookFromButtons();       
         });
+        getBookFromButtons();
+        deleteBookFromButtons();
       });
     }
 
@@ -76,7 +71,7 @@
         .catch((error) => {
           console.error("Erreur :", error);
         });
-    }     
+    }
 
     function addBook() {
       const form = document.getElementById("add-form");
@@ -115,7 +110,7 @@
       });
     }
 
-      function getBookFromButtons() {
+    function getBookFromButtons() {
       const editButtons = document.querySelectorAll(".update");
 
       const buttonsNodeList = [];
@@ -126,8 +121,8 @@
       buttonsNodeList.forEach((button) => {
         button.addEventListener("click", function () {
           const isbn = this.getAttribute("data-id");
-          const bookItem = document.getElementById("book-item");          
-          if (bookItem.innerHTML == "") {           
+          const bookItem = document.getElementById("book-item");
+          if (bookItem.innerHTML == "") {
             displayOneBook(isbn);
             updateBook(isbn);
           } else {
@@ -140,37 +135,37 @@
     }
 
     function updateBook(id) {
-        const form = document.querySelector("#update-form");
-  
-        form.addEventListener("submit", (event) => {
-          event.preventDefault();
-          const url = `${baseUrl}api/books/${id}`;
-  
-          const bookData = {
-            title: document.querySelector("#updated-title").value,
-            releaseDate: form.querySelector("#updated-date").value,
-          };
-  
-          fetch(url, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ book: bookData }),
+      const form = document.querySelector("#update-form");
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const url = `${baseUrl}api/books/${id}`;
+
+        const bookData = {
+          title: document.querySelector("#updated-title").value,
+          releaseDate: form.querySelector("#updated-date").value,
+        };
+
+        fetch(url, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ book: bookData }),
+        })
+          .then((booksData) => {
+            if (!booksData.ok) {
+              throw new Error("Problème avec la requête Fetch");
+            }
           })
-            .then((booksData) => {
-              if (!booksData.ok) {
-                throw new Error("Problème avec la requête Fetch");
-              }
-            })
-            .then(() => {
-              window.location.reload();
-            })
-            .catch((error) => {
-              console.error("Erreur:", error);
-            });
-        });  
-    } 
+          .then(() => {
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Erreur:", error);
+          });
+      });
+    }
 
     function getOneBook(id) {
       return fetch(baseUrl + "api/books/" + id)
@@ -230,44 +225,44 @@
     }
 
     function deleteBookFromButtons() {
-        const deleteButtons = document.querySelectorAll(".delete");
-  
-        deleteButtons.forEach((button) => {
-          button.addEventListener("click", function () {
-            const isbn = this.getAttribute("data-id");
-            deleteOneBook(isbn);
-          });
+      const deleteButtons = document.querySelectorAll(".delete");
+
+      deleteButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+          const isbn = this.getAttribute("data-id");
+          deleteOneBook(isbn);
         });
-      }
-  
-      function deleteOneBook(id) {
-        const deletedItems = document.getElementsByClassName(id);
-  
-        const bookData = {
-          title: deletedItems[0].textContent,
-          releaseDate: deletedItems[1].textContent,
-        };
-  
-        fetch(baseUrl + "api/books/" + id, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ book: bookData }),
+      });
+    }
+
+    function deleteOneBook(id) {
+      const deletedItems = document.getElementsByClassName(id);
+
+      const bookData = {
+        title: deletedItems[0].textContent,
+        releaseDate: deletedItems[1].textContent,
+      };
+
+      fetch(baseUrl + "api/books/" + id, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ book: bookData }),
+      })
+        .then((booksData) => {
+          if (!booksData.ok) {
+            throw new Error("Problème avec la requête Fetch");
+          }
+          console.log(bookData);
         })
-          .then((booksData) => {
-            if (!booksData.ok) {
-              throw new Error("Problème avec la requête Fetch");
-            }
-            console.log(bookData);
-          })
-          .then(() => {
-            window.location.reload();
-          })
-          .catch((error) => {
-            console.error("Erreur:", error);
-          });
-      }
+        .then(() => {
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Erreur:", error);
+        });
+    }
 
     displayBooks();
     addBook();
