@@ -6,6 +6,10 @@ header {
   background-color: #f2f2f2;
 }
 
+h1 {
+  margin-left: 25%;
+}
+
 .grid-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
